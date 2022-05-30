@@ -20,7 +20,7 @@ Instead, use this provider to just get some simple data back.
 
 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/HTTP_logo.svg/220px-HTTP_logo.svg.png" width="200px">
 
-<img src="https://grpc.io/img/logos/grpc-logo.png" width="200px">
+<img src="https://grpc.io/img/landing-2.svg" >
 
 
 Maintainers
