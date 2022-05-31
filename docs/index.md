@@ -14,6 +14,8 @@ The gRPC service can return arbitrary protobuf messages that are deserialized to
 
 ## Example Usage
 
+You can find a full end-to-end example [here](https://github.com/salrashid123/terraform-provider-grpc-full/tree/main/example)
+
 ```terraform
 terraform {
   required_providers {
