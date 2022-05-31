@@ -6,10 +6,10 @@ description: |-
 
 # gRPC Full Provider
 
-The gRPC-FULL provider is a utility provider for interacting with generic gRPC
+The gRPC-FULL provider is a utility for interacting with generic gRPC
 servers as part of a Terraform configuration. 
 
-The gRPC service can return arbitrary protobuf messages that are deserialized to JSON for use in terraform.
+Use this provider to construct a gRPC request protobuf message in JSON, send it to a remote system and deserialize the binary response as JSON for use in the terraform module
 
 
 ## Example Usage

@@ -102,7 +102,7 @@ output "data" {
 }
 ```
 
-For other configurations, see [example/index.md](blob/main/docs/index.md)
+For other configurations, see [example/README.md](https://github.com/salrashid123/terraform-provider-grpc-full/tree/main/example)
 
 Building the DEV Provider
 ---------------------
