@@ -6,7 +6,7 @@ description: |-
 
 # `grpc` Data Source
 
-The `grpc` data source  facilitates returning data from an external gRPC service.
+The `grpc` data source  facilitates acquiring data from an arbitrary external gRPC service.
 
 ## Example Usage
 
@@ -45,7 +45,10 @@ data "grpc" "example" {
   request_body = jsonencode({
     "@type"    = "echo.EchoRequest",
     first_name = "sal",
-    last_name  = "amander"
+    last_name  = "mander"
+    middle_name = {
+      name = "a"
+    }    
   })
 
 }
@@ -63,10 +66,13 @@ output "data" {
 The following arguments are supported:
 
 * `url` - (Required) The URL to request data from. This URL must respond with
-  _must_ include the service and method: (eg `"https://localhost:50051/echo.EchoServer/SayHello"`)
+  _must_ include the service and method: 
+  (eg `"https://localhost:50051/echo.EchoServer/SayHello"`)
 
 
-* `registry_files`: this is a list of the compiled descriptors to load.  You must set the `@type` key
+* `registry_files`: this is a list of the compiled descriptors to load.  
+  (`protoc --descriptor_set_out=echo.pb  echo.proto`).
+  You must set the `@type` key
 
 * `request_type`: the message type sent to the server (eg `"echo.EchoRequest"`)
 

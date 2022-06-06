@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 	"time"
 
-	echo "github.com/salrashid123/grpc_dynamic_pb/example/src/echo"
+	echo "github.com/salrashid123/grpc_wireformat/grpc_services/src/echo"
 
 	"log"
 
@@ -75,7 +75,9 @@ func main() {
 	}
 	// now make a gRPC call
 
-	r, err := c.SayHello(ctx, &echo.EchoRequest{FirstName: "sal", LastName: "amander"})
+	r, err := c.SayHello(ctx, &echo.EchoRequest{FirstName: "sal", LastName: "mander", MiddleName: &echo.Middle{
+		Name: "a",
+	}})
 	if err != nil {
 		log.Fatalf("could not greet: %v", err)
 	}

@@ -8,9 +8,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io"
-	"mime"
 	"net/http"
-	"regexp"
 	"strings"
 	"time"
 
@@ -150,7 +148,11 @@ func dataSourceRead(ctx context.Context, d *schema.ResourceData, meta interface{
 
 	for _, fileContentB64 := range pbFiles {
 
-		fileContent, err := base64.StdEncoding.DecodeString(fileContentB64.(string))
+		fc, ok := fileContentB64.(string)
+		if !ok {
+			return append(diags, diag.Errorf("Error converting filecontent to string")...)
+		}
+		fileContent, err := base64.StdEncoding.DecodeString(fc)
 		if err != nil {
 			return append(diags, diag.Errorf("Error decoding file .pb ")...)
 		}
@@ -276,7 +278,11 @@ func dataSourceRead(ctx context.Context, d *schema.ResourceData, meta interface{
 	req.Header.Set("content-type", "application/grpc")
 
 	for name, value := range headers {
-		req.Header.Set(name, value.(string))
+		v, ok := value.(string)
+		if !ok {
+			return append(diags, diag.Errorf("Error converting header [%s] to string: %s", name, err)...)
+		}
+		req.Header.Set(name, v)
 	}
 
 	resp, err := client.Do(req)
@@ -284,12 +290,8 @@ func dataSourceRead(ctx context.Context, d *schema.ResourceData, meta interface{
 		return append(diags, diag.Errorf("Error creating grpcCall: %s", err)...)
 	}
 	if resp.StatusCode != http.StatusOK {
-		return append(diags, diag.Errorf("Error making grpcCall: %s", err)...)
+		return append(diags, diag.Errorf("Error grpcCall status !=StatusOK  got: %s", resp.Status)...)
 	}
-	// resp, err := client.Post(url, "application/grpc", reader)
-	// if err != nil {
-	// 	return append(diags, diag.Errorf("Error making http POST: %s", err)...)
-	// }
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return append(diags, diag.Errorf("Error setting HTTP response body: %s", err)...)
@@ -342,30 +344,4 @@ func dataSourceRead(ctx context.Context, d *schema.ResourceData, meta interface{
 	d.SetId(url)
 
 	return diags
-}
-
-// This is to prevent potential issues w/ binary files
-// and generally unprintable characters
-// See https://github.com/hashicorp/terraform/pull/3858#issuecomment-156856738
-func isContentTypeText(contentType string) bool {
-
-	parsedType, params, err := mime.ParseMediaType(contentType)
-	if err != nil {
-		return false
-	}
-
-	allowedContentTypes := []*regexp.Regexp{
-		regexp.MustCompile("^text/.+"),
-		regexp.MustCompile("^application/json$"),
-		regexp.MustCompile("^application/samlmetadata\\+xml"),
-	}
-
-	for _, r := range allowedContentTypes {
-		if r.MatchString(parsedType) {
-			charset := strings.ToLower(params["charset"])
-			return charset == "" || charset == "utf-8" || charset == "us-ascii"
-		}
-	}
-
-	return false
 }

@@ -14,7 +14,7 @@ Instead, use this provider to just get some simple data back.
 
 
 - Website: https://www.terraform.io
-- [using protorefelect, dynamicpb and wire-encoding to send messages](https://github.com/salrashid123/grpc_wireformat)
+- [using protorefelect, dynamicpb and wire-encoding to send messages](https://blog.salrashid.dev/articles/2022/grpc_wireformat/)
 
 - [![Gitter chat](https://badges.gitter.im/hashicorp-terraform/Lobby.png)](https://gitter.im/hashicorp-terraform/Lobby)
 
@@ -58,7 +58,7 @@ Once compiled, you can use this provider after setting some required values:
 * `request_type`: the message type sent to the server
 * `response_type`: the message sent by the server
 
-For an end-to-end example, see the repos `example/` folder for instructions
+For an end-to-end example, see the repos [example/](https://github.com/salrashid123/terraform-provider-grpc-full/tree/main/example) folder for instructions
 
 ```hcl
 terraform {
@@ -91,8 +91,12 @@ data "grpc" "example" {
   request_body = jsonencode({
     "@type"    = "echo.EchoRequest",
     first_name = "sal",
-    last_name  = "amander"
+    last_name  = "mander"
+    middle_name = {
+      name = "a"
+    }
   })
+
   request_type  = "echo.EchoRequest"
   response_type = "echo.EchoReply"
 }

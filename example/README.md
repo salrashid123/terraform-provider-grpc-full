@@ -11,7 +11,6 @@ go run src/grpc_server.go
 
 ```
 # test standalone client
-
 go run src/client/main.go
 ```
 
@@ -27,9 +26,9 @@ Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
 
 Outputs:
 
-data = "Hello sal amander"
+data = "Hello sal a amander"
 
 ```
 
-The output will show a sample resonse from the gRPC server
+The output will show a sample response from the gRPC server
 

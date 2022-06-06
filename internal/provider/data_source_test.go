@@ -120,7 +120,8 @@ x1mpmqYktTV/Y7QcHQsrVaZ+4WWYO0+Erp1mYrm7EUOhvGOGrp/6mw==
 -----END RSA PRIVATE KEY-----`
 
 	// package echo;
-	echopb = `CpECChNzcmMvZWNoby9lY2hvLnByb3RvEgRlY2hvIkkKC0VjaG9SZXF1ZXN0Eh0KCmZpcnN0X25hbWUYASABKAlSCWZpcnN0TmFtZRIbCglsYXN0X25hbWUYAiABKAlSCGxhc3ROYW1lIiUKCUVjaG9SZXBseRIYCgdtZXNzYWdlGAEgASgJUgdtZXNzYWdlMj4KCkVjaG9TZXJ2ZXISMAoIU2F5SGVsbG8SES5lY2hvLkVjaG9SZXF1ZXN0Gg8uZWNoby5FY2hvUmVwbHkiAEI6WjhnaXRodWIuY29tL3NhbHJhc2hpZDEyMy9ncnBjX2R5bmFtaWNfcGIvZXhhbXBsZS9zcmMvZWNob2IGcHJvdG8z`
+	// cat src/echo/echo.pb |base64
+	echopb = `CuQCChNzcmMvZWNoby9lY2hvLnByb3RvEgRlY2hvIhwKBk1pZGRsZRISCgRuYW1lGAEgASgJUgRuYW1lIngKC0VjaG9SZXF1ZXN0Eh0KCmZpcnN0X25hbWUYASABKAlSCWZpcnN0TmFtZRIbCglsYXN0X25hbWUYAiABKAlSCGxhc3ROYW1lEi0KC21pZGRsZV9uYW1lGAMgASgLMgwuZWNoby5NaWRkbGVSCm1pZGRsZU5hbWUiJQoJRWNob1JlcGx5EhgKB21lc3NhZ2UYASABKAlSB21lc3NhZ2UyPgoKRWNob1NlcnZlchIwCghTYXlIZWxsbxIRLmVjaG8uRWNob1JlcXVlc3QaDy5lY2hvLkVjaG9SZXBseSIAQkBaPmdpdGh1Yi5jb20vc2FscmFzaGlkMTIzL2dycGNfd2lyZWZvcm1hdC9ncnBjX3NlcnZpY2VzL3NyYy9lY2hvYgZwcm90bzM=`
 )
 
 type Server struct {
@@ -154,7 +155,10 @@ data "grpc" "example" {
   request_body = jsonencode({
     "@type"    = "echo.EchoRequest",
     first_name = "sal",
-    last_name  = "amander"
+    last_name  = "mander",
+    middle_name = {
+		name = "a"
+	} 	
   })
 
 }
@@ -184,9 +188,9 @@ func TestDataSource_test_basic(t *testing.T) {
 
 					outputs := s.RootModule().Outputs
 
-					if outputs["data"].Value != "Hello sal amander" {
+					if outputs["data"].Value != "Hello sal a mander" {
 						return fmt.Errorf(
-							`'data' output is %s; want 'Hello sal amander'`,
+							`'data' output is %s; want 'Hello sal a mander'`,
 							outputs["data"].Value,
 						)
 					}
@@ -214,7 +218,10 @@ data "grpc" "example" {
   request_body = jsonencode({
     "@type"    = "foo.EchoRequest",
     first_name = "sal",
-    last_name  = "amander"
+    last_name  = "mander",
+    middle_name = {
+		name = "a"
+	} 	
   })
 
 }
@@ -235,14 +242,19 @@ func TestDataSource_test_error(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      fmt.Sprintf(testDataSourceConfig_error, testHttpMock.Address, caCert, echopb),
-				ExpectError: regexp.MustCompile("Error Registering proto file"),
+				ExpectError: regexp.MustCompile("Error finding request message type"),
 			},
 		},
 	})
 }
 
 func (s *Server) SayHello(ctx context.Context, in *echo.EchoRequest) (*echo.EchoReply, error) {
-	return &echo.EchoReply{Message: "Hello " + in.FirstName + " " + in.LastName}, nil
+	mname := ""
+	m := in.MiddleName
+	if m != nil {
+		mname = m.Name
+	}
+	return &echo.EchoReply{Message: "Hello " + in.FirstName + " " + mname + " " + in.LastName}, nil
 }
 
 func setUpMockGRPCServer(tlsCert []byte, tlsKey []byte) (*TestGrpcMock, error) {
